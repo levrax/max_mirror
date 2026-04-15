@@ -1,0 +1,42 @@
+services:
+  max-bot:
+    build: .
+    container_name: max-bot
+    image: max-bot:latest
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    networks:
+      - max_bot_network
+
+  max-worker:
+    container_name: max-worker
+    image: max-bot:latest
+    command: python -u worker.py
+    env_file:
+      - .env
+    restart: unless-stopped
+    stop_grace_period: 10s
+    volumes:
+      - ./data:/app/data
+    networks:
+      - max_bot_network
+
+  max-listener:
+    container_name: max-listener
+    image: max-bot:latest
+    command: python -u max_listener.py
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    networks:
+      - max_bot_network
+
+networks:
+  max_bot_network:
+    driver: bridge
+    name: max_bot_network
